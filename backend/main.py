@@ -15,11 +15,18 @@ app = FastAPI(title=settings.PROJECT_NAME)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def log_requests(request, call_next):
+    print(f"Request: {request.method} {request.url}")
+    response = await call_next(request)
+    print(f"Response: {response.status_code}")
+    return response
 app.include_router(health_router, prefix="/health", tags=["health"])
 app.include_router(auth_router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(catalog_router, prefix=f"{settings.API_V1_STR}/catalog", tags=["catalog"])

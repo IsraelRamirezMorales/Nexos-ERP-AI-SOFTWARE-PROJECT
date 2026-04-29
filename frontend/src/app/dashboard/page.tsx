@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area 
 } from "recharts";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 
 const data = [
@@ -17,6 +18,7 @@ const data = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [stats, setStats] = useState({
     totalSales: 0,
     totalProducts: 0,
@@ -24,11 +26,17 @@ export default function DashboardPage() {
   });
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
     // Fetch stats from backend
     Promise.all([
-      apiFetch("/catalog/products"),
-      apiFetch("/clients/"),
-      apiFetch("/sales/"),
+      apiFetch("/catalog/products").catch(() => []),
+      apiFetch("/clients/").catch(() => []),
+      apiFetch("/sales/").catch(() => []),
     ]).then(([products, clients, sales]) => {
       setStats({
         totalProducts: products.length,
@@ -36,7 +44,7 @@ export default function DashboardPage() {
         totalSales: sales.reduce((acc: number, s: any) => acc + s.total, 0),
       });
     });
-  }, []);
+  }, [router]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

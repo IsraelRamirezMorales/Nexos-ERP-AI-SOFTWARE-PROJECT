@@ -15,6 +15,12 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   });
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      }
+    }
     const error = await response.json().catch(() => ({ detail: "Unknown error" }));
     throw new Error(error.detail || "API request failed");
   }
