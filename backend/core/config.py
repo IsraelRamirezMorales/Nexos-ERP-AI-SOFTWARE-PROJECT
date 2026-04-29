@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_PORT: int
 
+    SECRET_KEY: str
+    ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+
     SQLALCHEMY_DATABASE_URI: Optional[str] = None
 
     @property
